@@ -1,0 +1,11 @@
+spring:
+  profiles:
+    active: pub-sub,receiver,sender
+  application:
+    name: rabbitmq-hello
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /vhost_mmr
