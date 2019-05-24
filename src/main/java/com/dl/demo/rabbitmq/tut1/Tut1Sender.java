@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors.
+ * Copyright 2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,44 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.dl.demo.rabbitmq.fanout;
+package com.dl.demo.rabbitmq.tut1;
 
-import org.springframework.amqp.core.FanoutExchange;
+import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 /**
  * @author Gary Russell
  * @author Scott Deeg
- * @author Arnaud Cogoluègnes
  */
-public class Tut3Sender {
+public class Tut1Sender {
 
 	@Autowired
 	private RabbitTemplate template;
 
 	@Autowired
-	private FanoutExchange fanout;
-
-	AtomicInteger dots = new AtomicInteger(0);
-
-	AtomicInteger count = new AtomicInteger(0);
-
-	@Scheduled(fixedDelay = 5_000, initialDelay = 500)
+	private Queue queue;
+	
+	@Scheduled(fixedDelay = 5000, initialDelay = 500)
 	public void send() {
-		StringBuilder builder = new StringBuilder("Hello———fanout");
-		if (dots.getAndIncrement() == 3) {
-			dots.set(1);
-		}
-		for (int i = 0; i < dots.get(); i++) {
-			builder.append('.');
-		}
-		builder.append(count.incrementAndGet());
-		String message = builder.toString();
-		template.convertAndSend(fanout.getName(), "", message);
+		String message = "Hello World!";
+		this.template.convertAndSend(queue.getName(), message);
 		System.out.println(" [x] Sent '" + message + "'");
 	}
 

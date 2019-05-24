@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.dl.demo.rabbitmq.fanout;
+package com.dl.demo.rabbitmq.routing;
 
-import org.springframework.amqp.core.FanoutExchange;
+import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -27,30 +27,31 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Scott Deeg
  * @author Arnaud Cogoluègnes
  */
-public class Tut3Sender {
+public class Tut4Sender {
 
 	@Autowired
 	private RabbitTemplate template;
 
 	@Autowired
-	private FanoutExchange fanout;
+	private DirectExchange direct;
 
-	AtomicInteger dots = new AtomicInteger(0);
+	AtomicInteger index = new AtomicInteger(0);
 
 	AtomicInteger count = new AtomicInteger(0);
 
-	@Scheduled(fixedDelay = 5_000, initialDelay = 500)
+	private final String[] keys = {"orange", "black", "green"};
+
+	@Scheduled(fixedDelay = 5000, initialDelay = 500)
 	public void send() {
-		StringBuilder builder = new StringBuilder("Hello———fanout");
-		if (dots.getAndIncrement() == 3) {
-			dots.set(1);
+		StringBuilder builder = new StringBuilder("Hello to ");
+		if (this.index.incrementAndGet() == 3) {
+			this.index.set(0);
 		}
-		for (int i = 0; i < dots.get(); i++) {
-			builder.append('.');
-		}
-		builder.append(count.incrementAndGet());
+		String key = keys[this.index.get()];
+		builder.append(key).append(' ');
+		builder.append(this.count.incrementAndGet());
 		String message = builder.toString();
-		template.convertAndSend(fanout.getName(), "", message);
+		template.convertAndSend(direct.getName(), key, message);
 		System.out.println(" [x] Sent '" + message + "'");
 	}
 

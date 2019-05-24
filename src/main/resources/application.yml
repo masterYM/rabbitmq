@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: pub-sub,receiver,sender
+    active: tut4,receiver,sender
   application:
     name: rabbitmq-hello
   rabbitmq:

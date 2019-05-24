@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.dl.demo.rabbitmq.fanout;
+package com.dl.demo.rabbitmq.work_queues;
 
-import org.springframework.amqp.core.FanoutExchange;
+import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -27,21 +27,21 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Scott Deeg
  * @author Arnaud Cogoluègnes
  */
-public class Tut3Sender {
+public class Tut2Sender {
 
 	@Autowired
 	private RabbitTemplate template;
 
 	@Autowired
-	private FanoutExchange fanout;
+	private Queue queue;
 
 	AtomicInteger dots = new AtomicInteger(0);
 
 	AtomicInteger count = new AtomicInteger(0);
 
-	@Scheduled(fixedDelay = 5_000, initialDelay = 500)
+	@Scheduled(fixedDelay = 5000, initialDelay = 500)
 	public void send() {
-		StringBuilder builder = new StringBuilder("Hello———fanout");
+		StringBuilder builder = new StringBuilder("Hello");
 		if (dots.getAndIncrement() == 3) {
 			dots.set(1);
 		}
@@ -50,7 +50,7 @@ public class Tut3Sender {
 		}
 		builder.append(count.incrementAndGet());
 		String message = builder.toString();
-		template.convertAndSend(fanout.getName(), "", message);
+		template.convertAndSend(queue.getName(), message);
 		System.out.println(" [x] Sent '" + message + "'");
 	}
 
